@@ -5,6 +5,7 @@ import React, {
   RefObject
 } from 'react'
 import './App.css'
+
 import {
   Stitch,
   StitchAppClient,
@@ -13,85 +14,79 @@ import {
   AnonymousCredential
 } from 'mongodb-stitch-browser-sdk'
 
-type Comment = {
+type Productions = {
   _id: string,
-  owner_id: string,
-  comment: string
+  name: string
 }
 
-const client: StitchAppClient = Stitch.initializeDefaultAppClient('blogtutorial-xzhnn')
+const client: StitchAppClient = Stitch.initializeDefaultAppClient('theatredb-vnppd')
 
 class App extends Component {
   state: {
-    comments: Comment[],
+    productions: Productions[],
     loading: boolean
   }
-  newComment: RefObject<HTMLInputElement>
+  newProduction: RefObject<HTMLInputElement>
   db: RemoteMongoDatabase
   constructor(props: any) {
     super(props);
     this.state = {
-      comments: [],
+      productions: [],
       loading: true
     }
-    this.newComment = createRef<HTMLInputElement>()
+    this.newProduction = createRef<HTMLInputElement>()
     this.db = client
-      .getServiceClient(RemoteMongoClient.factory, 'aaron-moore-service')
-      .db('blog')
+      .getServiceClient(RemoteMongoClient.factory, 'theatre-db')
+      .db('theatre')
     client.auth
       .loginWithCredential(new AnonymousCredential())
       .then(() => {
-        this.fetchComments()
+        this.fetchProductions()
       })
       .catch(console.error);
   }
   render() {
     return (
       <div className="App">
-        <h1>This is a great blog post</h1>
-        <div id="content">
-          I think too long and hard about things that don't matter.
-        </div>
+        <h1>Theatre DB</h1>
         <br/>
-        <b>Comments:</b>
+        <b>Productions:</b>
         {this.state.loading
           ? <div>(loading)</div>
-          : <div id="comments">{
-            this.state.comments.map(c => (
-              <div key={c._id} className="comment">{c.comment}</div>
+          : <div id="productions">{
+            this.state.productions.map(p => (
+              <div key={p._id} className="production">{p.name}</div>
             ))
           }</div>
         }
         <br/>
-        <b>Add Comment:</b><br/>
-        <input ref={this.newComment}/><br/>
-        <button onClick={this.addComment.bind(this)}>Add</button>
+        <b>Add a Production:</b><br/>
+        <input ref={this.newProduction}/><br/>
+        <button onClick={this.addProduction.bind(this)}>Add</button>
       </div>
     )
   }
-  fetchComments() {
-    this.db.collection('comments')
+  fetchProductions() {
+    this.db.collection('productions')
       .find({}, { limit: 1000 })
       .asArray()
-      .then(comments => {
-        console.log(comments)
-        this.setState({ comments, loading: false })
+      .then(productions => {
+        this.setState({ productions, loading: false })
       })
   }
-  addComment(e: MouseEvent<HTMLButtonElement>) {
+  addProduction(e: MouseEvent<HTMLButtonElement>) {
     e.preventDefault()
     const userId = client.auth.user && client.auth.user.id
-    const newComment = this.newComment.current && this.newComment.current.value
-    if (userId && newComment) {
-      this.db.collection('comments')
+    const newProduction = this.newProduction.current && this.newProduction.current.value
+    if (userId && newProduction) {
+      this.db.collection('productions')
         .insertOne({
-          owner_id: client.auth.user && client.auth.user.id,
-          comment: newComment
+          name: newProduction
         })
         .then(() => {
-          this.fetchComments()
-          if (this.newComment.current) {
-            this.newComment.current.value = ''
+          this.fetchProductions()
+          if (this.newProduction.current) {
+            this.newProduction.current.value = ''
           }
         })
     }

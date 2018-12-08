@@ -2,6 +2,7 @@
   "name": "theatre-db",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://dk3n1blhsrjne.cloudfront.net/theatredb",
   "dependencies": {
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.12",
@@ -29,6 +30,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "@types/bson": "^1.0.11"
+    "@types/bson": "^1.0.11",
+    "mongodb-stitch-cli": "^1.2.0"
   }
 }
