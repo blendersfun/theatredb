@@ -6,8 +6,7 @@ import React, {
 } from 'react'
 
 import { RouteParams, Routes } from './routes'
-import { client } from './logic/stitch'
-import { AnonymousCredential } from 'mongodb-stitch-core-sdk'
+import { Auth } from './logic/Auth'
 
 interface AppState {
   page: ReactElement<any>,
@@ -26,16 +25,9 @@ export class App extends Component {
     }
   }
   async componentDidMount(): Promise<void> {
-    const routeParams = this.routeParamsFromHash(window.location.hash)
     this.listen()
-  
-    // Resolve stitch client auth before loading any pages:
-    if (!client.auth.isLoggedIn) {
-      await client.auth.loginWithCredential(new AnonymousCredential())
-    }
-
-    this.loginStateUpdated()
-    this.navigate(routeParams)
+    await Auth.init()
+    this.navigate(this.routeParamsFromHash(window.location.hash))
   }
   listen() {
     window.addEventListener('hashchange', this.hashChanged.bind(this))
@@ -64,21 +56,14 @@ export class App extends Component {
     this.setState({ page: Routes.evaulateRoute(routeParams) })
   }
   loginStateUpdated() {
-    const user = client.auth.user
-    if (!user) throw new Error('Logged in, but user was not defined.')
-
-    // The typescript definitions appear to be out of data with what the service
-    // is returning. Todo: file a bug about this.
-    const profile: any = user.profile
+    const user = Auth.user()
     this.setState({
-      isAnonymous: user.loggedInProviderType === 'anon-user',
-      userEmail: profile.data.email || null
+      isAnonymous: !!user,
+      userEmail: user && user.email
     })
   }
   async logout(): Promise<void> {
-    await client.auth.logout()
-    await client.auth.loginWithCredential(new AnonymousCredential())
-    this.loginStateUpdated()
+    await Auth.logout()
   }
   render() {
     return (

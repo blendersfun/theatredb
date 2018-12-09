@@ -6,7 +6,7 @@ import React, {
   ReactElement
 } from 'react'
 
-import { client, db } from '../../logic/stitch'
+import { Database } from '../../logic/Database'
 
 type Productions = {
   _id: string,
@@ -31,15 +31,14 @@ export class Home extends Component {
     this.fetchProductions()
   }
   async fetchProductions(): Promise<void> {
-    const productions = await db.collection('productions')
-      .find({}, { limit: 1000 })
-      .asArray()
-    this.setState({ productions, loading: false })
+    this.setState({
+      productions: await Database.fetch('productions'),
+      loading: false
+    })
   }
   async addProduction(newProduction: string): Promise<void> {
-    const userId = client.auth.user && client.auth.user.id
-    if (userId && newProduction) {
-      await db.collection('productions').insertOne({ name: newProduction })
+    if (newProduction) {
+      await Database.add('productions', { name: newProduction })
       await this.fetchProductions()
     }
   }

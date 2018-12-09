@@ -4,8 +4,7 @@ import React, {
   RefObject
 } from 'react'
 
-import { client } from '../../logic/stitch'
-import { UserPasswordCredential } from 'mongodb-stitch-core-sdk';
+import { Auth } from '../../logic/Auth';
 
 export class Login extends Component {
   username: RefObject<HTMLInputElement>
@@ -31,14 +30,8 @@ export class Login extends Component {
     const password = this.password.current
     if (!username) throw new Error('Username ref must refer to some element.')
     if (!password) throw new Error('Password ref must refer to some element.')
-    const credential = new UserPasswordCredential(username.value.trim(), password.value)
     try {
-      await client.auth.logout()
-      await client.auth.loginWithCredential(credential)
-      window.dispatchEvent(new CustomEvent('loginStateChanged'))
-      window.dispatchEvent(new CustomEvent('navigate', {
-        detail: { page: 'home' }
-      }))
+      await Auth.login(username.value.trim(), password.value)
     } catch (err) {
       console.log(err)
     }
