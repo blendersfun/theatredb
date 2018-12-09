@@ -4,17 +4,15 @@ import React, {
   RefObject
 } from 'react'
 
-import { client } from '../../logic/StitchAppClient'
+import { client } from '../../logic/stitch'
 import { UserPasswordCredential } from 'mongodb-stitch-core-sdk';
 
 export class Login extends Component {
-  state: {}
   username: RefObject<HTMLInputElement>
   password: RefObject<HTMLInputElement>
 
   constructor(props: any) {
     super(props)
-    this.state = {}
     this.username = createRef()
     this.password = createRef()
   }
@@ -28,25 +26,21 @@ export class Login extends Component {
       </div>
     )
   }
-  login() {
+  async login(): Promise<void> {
     const username = this.username.current
     const password = this.password.current
     if (!username) throw new Error('Username ref must refer to some element.')
     if (!password) throw new Error('Password ref must refer to some element.')
-    return client.auth.logout().then(() => {
-      return client.auth.loginWithCredential(
-        new UserPasswordCredential(username.value.trim(), password.value)
-      )
-    }).then(() => {
-      const loginSuccess = new CustomEvent('loginStateChanged')
-      const navigate = new CustomEvent('navigate', {
+    const credential = new UserPasswordCredential(username.value.trim(), password.value)
+    try {
+      await client.auth.logout()
+      await client.auth.loginWithCredential(credential)
+      window.dispatchEvent(new CustomEvent('loginStateChanged'))
+      window.dispatchEvent(new CustomEvent('navigate', {
         detail: { page: 'home' }
-      })
-      window.dispatchEvent(loginSuccess)
-      window.dispatchEvent(navigate)
-
-    }).catch(err => {
+      }))
+    } catch (err) {
       console.log(err)
-    })
+    }
   }
 }
