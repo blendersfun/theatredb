@@ -9,12 +9,14 @@ import { RouteParams, Routes } from './routes'
 import { client } from './logic/stitch'
 import { AnonymousCredential } from 'mongodb-stitch-core-sdk'
 
+interface AppState {
+  page: ReactElement<any>,
+  isAnonymous: boolean,
+  userEmail: string|null
+}
+
 export class App extends Component {
-  state: {
-    page: ReactElement<any>,
-    isAnonymous: boolean,
-    userEmail: string|null
-  }
+  state: AppState
   constructor(props: any) {
     super(props)
     this.state = {
@@ -61,26 +63,6 @@ export class App extends Component {
     const routeParams = this.routeParamsFromHash(window.location.hash)
     this.setState({ page: Routes.evaulateRoute(routeParams) })
   }
-  render() {
-    return (
-      <div className="App">
-        <div className="navMenu">
-          {this.renderLoginStatus()}
-        </div>
-        {this.state.page}
-      </div>
-    )
-  }
-  renderLoginStatus(): ReactElement<any> {
-    if (this.state.isAnonymous) {
-      return <a href="#page=login">Login</a>
-    } else {
-      return <div>
-        <span className="whoami">Logged in as {this.state.userEmail}</span>
-        <a onClick={this.logout.bind(this)} href="javascript:;">Logout</a>
-      </div>
-    }
-  }
   loginStateUpdated() {
     const user = client.auth.user
     if (!user) throw new Error('Logged in, but user was not defined.')
@@ -97,5 +79,39 @@ export class App extends Component {
     await client.auth.logout()
     await client.auth.loginWithCredential(new AnonymousCredential())
     this.loginStateUpdated()
+  }
+  render() {
+    return (
+      <AppUI {...this.state}
+        logout={this.logout.bind(this)}
+        />
+    )
+  }
+}
+
+interface AppProps extends AppState {
+  logout: () => void
+}
+
+export class AppUI extends Component<AppProps> {
+  render() {
+    return (
+      <div className="App">
+        <div className="navMenu">
+          {this.renderLoginStatus()}
+        </div>
+        {this.props.page}
+      </div>
+    )
+  }
+  renderLoginStatus(): ReactElement<any> {
+    if (this.props.isAnonymous) {
+      return <a href="#page=login">Login</a>
+    } else {
+      return <div>
+        <span className="whoami">Logged in as {this.props.userEmail}</span>
+        <a onClick={this.props.logout} href="javascript:;">Logout</a>
+      </div>
+    }
   }
 }

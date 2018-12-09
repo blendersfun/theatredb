@@ -6,7 +6,6 @@ import React, {
   ReactElement
 } from 'react'
 
-import { RemoteMongoDatabase } from 'mongodb-stitch-browser-sdk'
 import { client, db } from '../../logic/stitch'
 
 type Productions = {
@@ -14,22 +13,54 @@ type Productions = {
   name: string
 }
 
+interface HomeState {
+  productions: Productions[],
+  loading: boolean
+}
+
 export class Home extends Component {
-  state: {
-    productions: Productions[],
-    loading: boolean
-  }
-  newProduction: RefObject<HTMLInputElement>
+  state: HomeState
   constructor(props: any) {
     super(props)
     this.state = {
       productions: [],
       loading: true
     }
-    this.newProduction = createRef<HTMLInputElement>()
   }
   componentDidMount() {
     this.fetchProductions()
+  }
+  async fetchProductions(): Promise<void> {
+    const productions = await db.collection('productions')
+      .find({}, { limit: 1000 })
+      .asArray()
+    this.setState({ productions, loading: false })
+  }
+  async addProduction(newProduction: string): Promise<void> {
+    const userId = client.auth.user && client.auth.user.id
+    if (userId && newProduction) {
+      await db.collection('productions').insertOne({ name: newProduction })
+      await this.fetchProductions()
+    }
+  }
+  render() {
+    return (
+      <HomeUI {...this.state}
+        addProduction={this.addProduction.bind(this)}
+        />
+    )
+  }
+}
+
+interface HomeProps extends HomeState {
+  addProduction: (newProduction: string) => Promise<void>
+}
+
+export class HomeUI extends Component<HomeProps> {
+  newProduction: RefObject<HTMLInputElement>
+  constructor(props: HomeProps) {
+    super(props)
+    this.newProduction = createRef()
   }
   render() {
     return (
@@ -46,32 +77,24 @@ export class Home extends Component {
     )
   }
   renderProductions(): ReactElement<HTMLDivElement> {
-    if (this.state.loading) {
+    if (this.props.loading) {
       return <div>(loading)</div>
     } else {
       return <div id="productions">{
-        this.state.productions.map(p => (
+        this.props.productions.map(p => (
           <div key={p._id} className="production">{p.name}</div>
         ))
       }</div>
     }
   }
-  async fetchProductions(): Promise<void> {
-    const productions = await db.collection('productions')
-      .find({}, { limit: 1000 })
-      .asArray()
-    this.setState({ productions, loading: false })
-  }
   async addProduction(e: MouseEvent<HTMLButtonElement>): Promise<void> {
     e.preventDefault()
-    const userId = client.auth.user && client.auth.user.id
     const newProduction = this.newProduction.current && this.newProduction.current.value
-    if (userId && newProduction) {
-      await db.collection('productions').insertOne({ name: newProduction })
-      await this.fetchProductions()
-      if (this.newProduction.current) {
-        this.newProduction.current.value = ''
-      }
+    if (newProduction) {
+      await this.props.addProduction(newProduction)
+    }
+    if (this.newProduction.current) {
+      this.newProduction.current.value = ''
     }
   }
 }
