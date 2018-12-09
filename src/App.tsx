@@ -58,7 +58,7 @@ export class App extends Component {
   loginStateUpdated() {
     const user = Auth.user()
     this.setState({
-      isAnonymous: !!user,
+      isAnonymous: !user,
       userEmail: user && user.email
     })
   }
