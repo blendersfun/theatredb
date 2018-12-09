@@ -4,14 +4,18 @@
   "private": true,
   "homepage": "https://dk3n1blhsrjne.cloudfront.net/theatredb",
   "dependencies": {
+    "mongodb-stitch-browser-sdk": "^4.1.1",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-scripts": "2.1.1"
+  },
+  "devDependencies": {
+    "@types/bson": "^1.0.11",
     "@types/jest": "^23.3.10",
     "@types/node": "^10.12.12",
     "@types/react": "^16.7.13",
     "@types/react-dom": "^16.0.11",
-    "mongodb-stitch-browser-sdk": "^4.1.1",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1",
+    "mongodb-stitch-cli": "^1.2.0",
     "typescript": "^3.2.2"
   },
   "scripts": {
@@ -28,9 +32,5 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ],
-  "devDependencies": {
-    "@types/bson": "^1.0.11",
-    "mongodb-stitch-cli": "^1.2.0"
-  }
+  ]
 }

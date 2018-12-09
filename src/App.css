@@ -1,6 +1,14 @@
-.App {
+.app {
   padding: 20px;
 }
-#comments {
-  padding-left: 10px;
+.navMenu {
+  text-align: right;
+  padding: 10px 20px;
+  background: #eee;
+}
+.whoami {
+  padding-right: 20px;
+}
+.page {
+  margin: 40px;
 }
