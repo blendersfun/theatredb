@@ -7,10 +7,11 @@ import React, {
 
 import { RouteParams, Routes } from './routes'
 import { Auth } from './logic/Auth'
+import { Events } from './logic/Events'
 
-interface AppState {
+export interface AppState {
   page: ReactElement<any>,
-  isAnonymous: boolean,
+  isLoggedIn: boolean,
   userEmail: string|null
 }
 
@@ -20,22 +21,22 @@ export class App extends Component {
     super(props)
     this.state = {
       page: <div/>,
-      isAnonymous: true,
+      isLoggedIn: false,
       userEmail: null
     }
   }
   async componentDidMount(): Promise<void> {
-    this.listen()
+    this.attach()
     await Auth.init()
     this.navigate(this.routeParamsFromHash(window.location.hash))
   }
-  listen() {
-    window.addEventListener('hashchange', this.hashChanged.bind(this))
-    window.addEventListener('loginStateChanged', this.loginStateUpdated.bind(this))
-    window.addEventListener('navigate', (event: Event) => {
-      const customEvent = event as CustomEvent<RouteParams>
-      this.navigate(customEvent.detail)
-    })
+  componentWillUnmount() {
+    Events.detatch(this)
+  }
+  attach() {
+    Events.attach('hashchange', this.hashChanged, this)
+    Events.attach('loginStateChanged', this.loginStateChanged, this)
+    Events.attach('navigate', this.onNavigate, this)
   }
   routeParamsFromHash(hashStr: string): RouteParams {
     const hash = new URLSearchParams(hashStr.slice(1))
@@ -44,6 +45,10 @@ export class App extends Component {
     return {
       page
     }
+  }
+  onNavigate(event: Event) {
+    const customEvent = event as CustomEvent<RouteParams>
+    this.navigate(customEvent.detail)
   }
   navigate(routeParams: RouteParams) {
     window.history.pushState({}, '', `#page=${routeParams.page}`)
@@ -55,10 +60,10 @@ export class App extends Component {
     const routeParams = this.routeParamsFromHash(window.location.hash)
     this.setState({ page: Routes.evaulateRoute(routeParams) })
   }
-  loginStateUpdated() {
+  loginStateChanged() {
     const user = Auth.user()
     this.setState({
-      isAnonymous: !user,
+      isLoggedIn: user !== null,
       userEmail: user && user.email
     })
   }
@@ -74,7 +79,7 @@ export class App extends Component {
   }
 }
 
-interface AppProps extends AppState {
+export interface AppProps extends AppState {
   logout: () => void
 }
 
@@ -90,7 +95,7 @@ export class AppUI extends Component<AppProps> {
     )
   }
   renderLoginStatus(): ReactElement<any> {
-    if (this.props.isAnonymous) {
+    if (!this.props.isLoggedIn) {
       return <a href="#page=login">Login</a>
     } else {
       return <div>

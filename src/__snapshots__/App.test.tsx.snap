@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders without crashing 1`] = `
+exports[`renders a test page with a no logged in user but an email present the same as no logged in user 1`] = `
 <div
   className="App"
 >
@@ -12,6 +12,56 @@ exports[`renders without crashing 1`] = `
     >
       Login
     </a>
+  </div>
+  <div>
+     Test Page 
+  </div>
+</div>
+`;
+
+exports[`renders a test page with a user logged in 1`] = `
+<div
+  className="App"
+>
+  <div
+    className="navMenu"
+  >
+    <div>
+      <span
+        className="whoami"
+      >
+        Logged in as 
+        snape@hogwarts.edu
+      </span>
+      <a
+        href="javascript:;"
+        onClick={[MockFunction]}
+      >
+        Logout
+      </a>
+    </div>
+  </div>
+  <div>
+     Test Page 
+  </div>
+</div>
+`;
+
+exports[`renders a test page with a user not logged in 1`] = `
+<div
+  className="App"
+>
+  <div
+    className="navMenu"
+  >
+    <a
+      href="#page=login"
+    >
+      Login
+    </a>
+  </div>
+  <div>
+     Test Page 
   </div>
 </div>
 `;

@@ -4,6 +4,7 @@ import {
   AnonymousCredential,
   UserPasswordCredential
 } from 'mongodb-stitch-core-sdk'
+import { Events } from './Events'
 
 export type User = {
   email: string
@@ -15,21 +16,19 @@ export class Auth {
     if (!client.auth.isLoggedIn) {
       await client.auth.loginWithCredential(new AnonymousCredential())
     }
-    window.dispatchEvent(new CustomEvent('loginStateChanged'))
+    Events.dispatch('loginStateChanged')
   }
   static async login(email: string, password: string): Promise<void> {
     await client.auth.logout()
     const credential = new UserPasswordCredential(email, password)
     await client.auth.loginWithCredential(credential)
-    window.dispatchEvent(new CustomEvent('loginStateChanged'))
-    window.dispatchEvent(new CustomEvent('navigate', {
-      detail: { page: 'home' }
-    }))
+    Events.dispatch('loginStateChanged')
+    Events.dispatch('navigate', { page: 'home' })
   }
   static async logout(): Promise<void> {
     await client.auth.logout()
     await client.auth.loginWithCredential(new AnonymousCredential())
-    window.dispatchEvent(new CustomEvent('loginStateChanged'))
+    Events.dispatch('loginStateChanged')
   }
   static user(): User|null {
     const user = client.auth.user
