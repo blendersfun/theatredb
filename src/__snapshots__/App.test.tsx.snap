@@ -1,6 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders a test page with a no logged in user but an email present the same as no logged in user 1`] = `
+exports[`logic initializes the state when constructed 1`] = `<div />`;
+
+exports[`ui renders a test page with a no logged in user but an email present the same as no logged in user 1`] = `
 <div
   className="App"
 >
@@ -19,7 +21,7 @@ exports[`renders a test page with a no logged in user but an email present the s
 </div>
 `;
 
-exports[`renders a test page with a user logged in 1`] = `
+exports[`ui renders a test page with a user logged in 1`] = `
 <div
   className="App"
 >
@@ -47,7 +49,7 @@ exports[`renders a test page with a user logged in 1`] = `
 </div>
 `;
 
-exports[`renders a test page with a user not logged in 1`] = `
+exports[`ui renders a test page with a user not logged in 1`] = `
 <div
   className="App"
 >

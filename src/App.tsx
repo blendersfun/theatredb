@@ -14,9 +14,7 @@ export interface AppState {
   isLoggedIn: boolean,
   userEmail: string|null
 }
-
-export class App extends Component {
-  state: AppState
+export class App extends Component<{}, AppState> {
   constructor(props: any) {
     super(props)
     this.state = {
@@ -34,9 +32,27 @@ export class App extends Component {
     Events.detatch(this)
   }
   attach() {
-    Events.attach('hashchange', this.hashChanged, this)
-    Events.attach('loginStateChanged', this.loginStateChanged, this)
+    Events.attach('hashchange', this.onHashChanged, this)
+    Events.attach('loginStateChanged', this.onLoginStateChanged, this)
     Events.attach('navigate', this.onNavigate, this)
+  }
+  onNavigate(event: Event) {
+    const customEvent = event as CustomEvent<RouteParams>
+    this.navigate(customEvent.detail)
+  }
+  onHashChanged() {
+    const routeParams = this.routeParamsFromHash(window.location.hash)
+    this.setState({
+      page: Routes.evaulateRoute(routeParams)
+    })
+  }
+  onLoginStateChanged() {
+    const user = Auth.user()
+    console.log(user)
+    this.setState({
+      isLoggedIn: user !== null,
+      userEmail: user && user.email
+    })
   }
   routeParamsFromHash(hashStr: string): RouteParams {
     const hash = new URLSearchParams(hashStr.slice(1))
@@ -46,25 +62,10 @@ export class App extends Component {
       page
     }
   }
-  onNavigate(event: Event) {
-    const customEvent = event as CustomEvent<RouteParams>
-    this.navigate(customEvent.detail)
-  }
   navigate(routeParams: RouteParams) {
     window.history.pushState({}, '', `#page=${routeParams.page}`)
     this.setState({
       page: Routes.evaulateRoute(routeParams)
-    })
-  }
-  hashChanged() {
-    const routeParams = this.routeParamsFromHash(window.location.hash)
-    this.setState({ page: Routes.evaulateRoute(routeParams) })
-  }
-  loginStateChanged() {
-    const user = Auth.user()
-    this.setState({
-      isLoggedIn: user !== null,
-      userEmail: user && user.email
     })
   }
   async logout(): Promise<void> {
@@ -82,7 +83,6 @@ export class App extends Component {
 export interface AppProps extends AppState {
   logout: () => void
 }
-
 export class AppUI extends Component<AppProps> {
   render() {
     return (
