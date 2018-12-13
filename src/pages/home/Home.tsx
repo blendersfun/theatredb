@@ -6,7 +6,7 @@ import React, {
   ReactElement
 } from 'react'
 
-import { Database } from '../../logic/Database'
+import { db } from '../../logic/stitch'
 
 type Productions = {
   _id: string,
@@ -31,21 +31,29 @@ export class Home extends Component {
     this.fetchProductions()
   }
   async fetchProductions(): Promise<void> {
+    const productions = await db.collection('productions')
+      .find({}, { limit: 1000 })
+      .asArray()
     this.setState({
-      productions: await Database.fetch('productions'),
+      productions,
       loading: false
     })
   }
   async addProduction(newProduction: string): Promise<void> {
-    if (newProduction) {
-      await Database.add('productions', { name: newProduction })
-      await this.fetchProductions()
-    }
+    if (!newProduction) return
+    await db.collection('productions').insertOne({ name: newProduction })
+    await this.fetchProductions()
+  }
+  async updateProduction(updateIndex: string, updateName: string): Promise<void> {
+    if (!updateIndex || !updateName) return
+    // await Database.add('productions', { name: newProduction })
+    // await this.fetchProductions()
   }
   render() {
     return (
       <HomeUI {...this.state}
         addProduction={this.addProduction.bind(this)}
+        updateProduction={this.updateProduction.bind(this)}
         />
     )
   }
@@ -53,13 +61,18 @@ export class Home extends Component {
 
 interface HomeProps extends HomeState {
   addProduction: (newProduction: string) => Promise<void>
+  updateProduction: (updateIndex: string, updateName: string) => Promise<void>
 }
 
 export class HomeUI extends Component<HomeProps> {
   newProduction: RefObject<HTMLInputElement>
+  updateIndex: RefObject<HTMLInputElement>
+  updateName: RefObject<HTMLInputElement>
   constructor(props: HomeProps) {
     super(props)
     this.newProduction = createRef()
+    this.updateIndex = createRef()
+    this.updateName = createRef()
   }
   render() {
     return (
@@ -88,12 +101,10 @@ export class HomeUI extends Component<HomeProps> {
   }
   async addProduction(e: MouseEvent<HTMLButtonElement>): Promise<void> {
     e.preventDefault()
-    const newProduction = this.newProduction.current && this.newProduction.current.value
-    if (newProduction) {
-      await this.props.addProduction(newProduction)
-    }
-    if (this.newProduction.current) {
-      this.newProduction.current.value = ''
-    }
+    if (!this.newProduction.current || !this.newProduction.current.value) return
+    const newProduction = this.newProduction.current.value
+    this.newProduction.current.value = ''
+    if (!newProduction) return
+    await this.props.addProduction(newProduction)
   }
 }

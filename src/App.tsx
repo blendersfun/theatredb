@@ -48,7 +48,6 @@ export class App extends Component<{}, AppState> {
   }
   onLoginStateChanged() {
     const user = Auth.user()
-    console.log(user)
     this.setState({
       isLoggedIn: user !== null,
       userEmail: user && user.email
