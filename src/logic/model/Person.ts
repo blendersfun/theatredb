@@ -5,4 +5,9 @@ export type PersonDetail = PersonSummary & {
   scriptsContributedTo?: ScriptSummary[]
 }
 
-export class Person extends Document<PersonSummary, PersonDetail> {}
+export class Person extends Document<PersonSummary, PersonDetail> {
+  static collection = 'people'
+  identity(): any {
+    return { name: this.document.name }
+  }
+}

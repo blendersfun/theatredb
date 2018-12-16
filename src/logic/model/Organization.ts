@@ -6,5 +6,8 @@ export type OrganizationDetail = OrganizationSummary & {
 }
 
 export class Organization extends Document<OrganizationSummary, OrganizationDetail> {
-  
+  static collection = 'organizations'
+  identity(): any {
+    return { name: this.document.name }
+  }
 }

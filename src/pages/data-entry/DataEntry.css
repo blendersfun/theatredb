@@ -1,0 +1,15 @@
+.data-entry textarea {
+  width: 400px;
+  height: 250px;
+}
+.data-entry .container.horizontal {
+  display: flex;
+  flex-direction: row;
+}
+.data-entry .container.horizontal > * {
+  margin: 10px;
+}
+.data-entry .preview {
+  white-space: pre-wrap;
+  font-family: monospace;
+}

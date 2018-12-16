@@ -9,11 +9,29 @@ exports[`ui renders a test page with a no logged in user but an email present th
   <div
     className="navMenu"
   >
-    <a
-      href="#page=login"
+    <div
+      className="navLinks"
     >
-      Login
-    </a>
+      <a
+        href="#page=home"
+      >
+        Home
+      </a>
+      <a
+        href="#page=data-entry"
+      >
+        Data Entry
+      </a>
+    </div>
+    <div
+      className="loginStatus"
+    >
+      <a
+        href="#page=login"
+      >
+        Login
+      </a>
+    </div>
   </div>
   <div>
      Test Page 
@@ -28,19 +46,37 @@ exports[`ui renders a test page with a user logged in 1`] = `
   <div
     className="navMenu"
   >
-    <div>
-      <span
-        className="whoami"
-      >
-        Logged in as 
-        snape@hogwarts.edu
-      </span>
+    <div
+      className="navLinks"
+    >
       <a
-        href="javascript:;"
-        onClick={[MockFunction]}
+        href="#page=home"
       >
-        Logout
+        Home
       </a>
+      <a
+        href="#page=data-entry"
+      >
+        Data Entry
+      </a>
+    </div>
+    <div
+      className="loginStatus"
+    >
+      <div>
+        <span
+          className="whoami"
+        >
+          Logged in as 
+          snape@hogwarts.edu
+        </span>
+        <a
+          href="javascript:;"
+          onClick={[MockFunction]}
+        >
+          Logout
+        </a>
+      </div>
     </div>
   </div>
   <div>
@@ -56,11 +92,29 @@ exports[`ui renders a test page with a user not logged in 1`] = `
   <div
     className="navMenu"
   >
-    <a
-      href="#page=login"
+    <div
+      className="navLinks"
     >
-      Login
-    </a>
+      <a
+        href="#page=home"
+      >
+        Home
+      </a>
+      <a
+        href="#page=data-entry"
+      >
+        Data Entry
+      </a>
+    </div>
+    <div
+      className="loginStatus"
+    >
+      <a
+        href="#page=login"
+      >
+        Login
+      </a>
+    </div>
   </div>
   <div>
      Test Page 

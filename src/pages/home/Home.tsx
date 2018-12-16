@@ -10,7 +10,10 @@ import { db } from '../../logic/stitch'
 
 type Productions = {
   _id: string,
-  name: string
+  name: string,
+  organization: {
+    name: string
+  }
 }
 
 interface HomeState {
@@ -44,16 +47,10 @@ export class Home extends Component {
     await db.collection('productions').insertOne({ name: newProduction })
     await this.fetchProductions()
   }
-  async updateProduction(updateIndex: string, updateName: string): Promise<void> {
-    if (!updateIndex || !updateName) return
-    // await Database.add('productions', { name: newProduction })
-    // await this.fetchProductions()
-  }
   render() {
     return (
       <HomeUI {...this.state}
         addProduction={this.addProduction.bind(this)}
-        updateProduction={this.updateProduction.bind(this)}
         />
     )
   }
@@ -61,7 +58,6 @@ export class Home extends Component {
 
 interface HomeProps extends HomeState {
   addProduction: (newProduction: string) => Promise<void>
-  updateProduction: (updateIndex: string, updateName: string) => Promise<void>
 }
 
 export class HomeUI extends Component<HomeProps> {
@@ -94,7 +90,7 @@ export class HomeUI extends Component<HomeProps> {
     } else {
       return <div id="productions">{
         this.props.productions.map(p => (
-          <div key={p._id} className="production">{p.name}</div>
+          <div key={p._id} className="production">{p.name} by {p.organization && p.organization.name}</div>
         ))
       }</div>
     }

@@ -9,3 +9,7 @@ export const client: StitchAppClient = Stitch.initializeDefaultAppClient('theatr
 export const db: RemoteMongoDatabase = client
   .getServiceClient(RemoteMongoClient.factory, 'theatre-db')
   .db('theatre')
+
+export enum StitchError {
+  ArgumentsNotAllowed = 12
+}

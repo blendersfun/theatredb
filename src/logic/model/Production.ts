@@ -1,13 +1,14 @@
-import { db } from '../stitch'
 import { Document } from './Document'
-import { ProductionSummary, ScriptSummary } from './Summaries';
+import { ProductionSummary, ScriptSummary } from './Summaries'
+import { Organization } from './Organization'
+import { Script } from './Script'
 
 export type ProductionDetail = ProductionSummary & {
   script?: ScriptSummary,
   isProfessional?: boolean,
   schedule?: {
-    startDate?: Date, // In UTC, 7pm local time is used by convention.
-    endDate?: Date    // In UTC, 7pm local time is used by convention.
+    openingDate?: Date, // In UTC, 7pm local time is used by convention.
+    closingDate?: Date    // In UTC, 7pm local time is used by convention.
   },
   location?: {
     city?: string,
@@ -16,18 +17,17 @@ export type ProductionDetail = ProductionSummary & {
 }
 
 export class Production extends Document<ProductionSummary, ProductionDetail> {
-  async find(document: ProductionDetail): Promise<ProductionDetail|null> {
-    const name = document.name
-    const productions = await db.collection('productions').find({ name }).asArray() as ProductionDetail[]
-    if (productions.length > 1) {
-      throw new Error(
-        `More than one production exists with the name "${name}". ` +
-        `We now need to implement disambiguation logic.`
-      )
+  static collection = 'productions'
+  identity(): any {
+    return {
+      'name': this.document.name,
+      'organization.name': this.document.organization.name
     }
-    if (productions.length === 0) {
-      return null
+  }
+  async preSave(): Promise<void> {
+    await new Organization(this.document.organization).upsert()
+    if (this.document.script) {
+      await new Script(this.document.script).upsert()
     }
-    return productions[0]
   }
 }

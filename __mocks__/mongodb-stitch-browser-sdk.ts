@@ -9,5 +9,14 @@ export const RemoteMongoClient = {
   factory() {}
 }
 export const RemoteMongoClientInstance = {
-  db() {}
+  db() { return RemoteMongoDatabaseInstance; }
+}
+export const RemoteMongoDatabaseInstance = {
+  collection() { return RemoteMongoCollectionInstance; }
+}
+export const RemoteMongoCollectionInstance = {
+  find() { return RemoteMongoReadOperationInstance; }
+}
+export const RemoteMongoReadOperationInstance = {
+  asArray: jest.fn()
 }

@@ -2,9 +2,15 @@
   padding: 20px;
 }
 .navMenu {
-  text-align: right;
+  display: flex;
   padding: 10px 20px;
   background: #eee;
+}
+.navLinks {
+  flex: 1;
+}
+.navLinks > a + a {
+  margin-left: 10px;
 }
 .whoami {
   padding-right: 20px;

@@ -87,7 +87,13 @@ export class AppUI extends Component<AppProps> {
     return (
       <div className="App">
         <div className="navMenu">
-          {this.renderLoginStatus()}
+          <div className="navLinks">
+            <a href="#page=home">Home</a>
+            <a href="#page=data-entry">Data Entry</a>
+          </div>
+          <div className="loginStatus">
+            {this.renderLoginStatus()}
+          </div>
         </div>
         {this.props.page}
       </div>
