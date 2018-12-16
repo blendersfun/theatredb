@@ -1,0 +1,13 @@
+.home table {
+  width: 100%;
+}
+.home th {
+  cursor: pointer;
+}
+.home td {
+  padding: 3px 10px;
+}
+.home .production {
+  /* Disabling expanding of production detail rows for the moment: */
+  /* cursor: pointer; */
+}

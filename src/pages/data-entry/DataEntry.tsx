@@ -39,14 +39,30 @@ export class DataEntry extends Component {
           <div>
             <label>DPS List Entry:</label><br/>
             <textarea
+              className="list"
               ref={this.textareaDPSList}
               onChange={this.showPreview.bind(this)}
-              defaultValue={window.sessionStorage.DPSList}></textarea><br/>
+              defaultValue={window.sessionStorage.DPSList}
+              placeholder="M. Butterfly
+David Henry Hwang
+Artswest Playhouse and Gallery  | Seattle,  WA  Professional production,  Opening: 1/24/2019 thru  2/17/2019)"
+              ></textarea><br/>
             <label>DPS Detail Entry:</label><br/>
             <textarea
+              className="detail"
               ref={this.textareaDPSDetail}
               onChange={this.showPreview.bind(this)}
-              defaultValue={window.sessionStorage.DPSDetail}></textarea><br/>
+              defaultValue={window.sessionStorage.DPSDetail}
+              placeholder="M. Butterfly
+David Henry Hwang
+ISBN: 978-0-8222-0712-2
+Full Length, Drama
+7 men, 3 women (3 of the 7 men are nonspeaking roles)
+Total Cast: 10, Flexible Set
+$80 per performance.
+Bored with his routine posting in Beijing, and awkward with women, Rene Gallimard, a French diplomat, is easy prey for the subtle, delicate charms of Song Liling, a Chinese opera star who personifies Gallimard's fantasy vision of submissive, exotic oriental sexuality.
+&quot;With M. BUTTERFLY David Henry Hwang joins the first string of American playwrights.&quot; —Variety. &quot;Of all the young dramatists at work in America today, none is more audacious, imaginative, or gifted than David Henry Hwang…&quot; —The New Yorker. &quot;It will move you, it will thrill you, it may even surprise you.&quot; —NY Post.
+Winner of the Tony Award, the Drama Desk Award and the Outer Critics Circle Award as Best Broadway Play."></textarea><br/>
             <button onClick={this.saveToDatabase.bind(this)}>Save</button>
           </div>
           <div className="preview">

@@ -46,11 +46,11 @@ function parseAuthors(raw: string): PersonInRole[] {
     [, novelist, adaptor] = /based on the novel by ([\w ]+), adapted by ([\w ]+)/.exec(raw) || [,,,]
   } else {
     raw.trim().split(' and ').forEach(name => {
-      authors.push({ person: { name }, role: 'playwright' })
+      authors.push({ person: { name: name.trim() }, role: 'playwright' })
     })
   }
-  if (novelist) authors.push({ person: { name: novelist }, role: 'novelist' })
-  if (adaptor) authors.push({ person: { name: adaptor }, role: 'playwright' })
+  if (novelist) authors.push({ person: { name: novelist.trim() }, role: 'novelist' })
+  if (adaptor) authors.push({ person: { name: adaptor.trim() }, role: 'playwright' })
   return authors
 }
 
@@ -59,7 +59,7 @@ function parseAuthors(raw: string): PersonInRole[] {
  * - Example URL: https://www.dramatists.com/dps/productions.aspx
  * - Example Raw Record:
  * 
- *   The Call (Barfield)
+ *   The Call
  *   Tanya Barfield
  *   Seattle Public Theatre  | Seattle,  WA  Professional production,  Opening: 5/10/2019 thru  6/9/2019)
  */
@@ -107,16 +107,16 @@ export function entryFromDPSList(raw: string): Production|null {
  * - Example Url: http://www.dramatists.com/cgi-bin/db/single.asp?key=3971
  * - Example Record:
  * 
- *   A Doll's House, Part 2
- *   Lucas Hnath
- *   ISBN: 978-0-8222-3744-0
+ *   M. Butterfly
+ *   David Henry Hwang
+ *   ISBN: 978-0-8222-0712-2
  *   Full Length, Drama
- *   1 man, 3 women
- *   Total Cast: 4, Flexible Set
- *   $100 per performance.
- *   In the final scene of Ibsen’s 1879 groundbreaking masterwork, Nora Helmer makes the shocking decision to leave her husband and children, and begin a life on her own. This climactic event—when Nora slams the door on everything in her life—instantly propelled world drama into the modern age. In A DOLL’S HOUSE, PART 2, many years have passed since Nora’s exit. Now, there’s a knock on that same door. Nora has returned. But why? And what will it mean for those she left behind?
- *   “[A] smart, funny and utterly engrossing play…Hnath approaches what might seem like a hubristic project with the humility and avidity of an engaged Everyreader. A DOLL'S HOUSE, PART 2 gives vibrant theatrical life to the conversations that many of us had after first reading or seeing its prototype…” —NY Times. “…lucid and absorbing…Modern in its language, mordant in its humor and suspenseful in its plotting…the play judiciously balances conflicting ideas about freedom, love and responsibility.” —Time Out NY. “Hnath’s inspired writing, which endows each character with an arsenal of fastballs, curveballs and spitballs, keep[s] us disarmingly off-balance. He’s an uncommonly gifted parodist. For all its seriousness, A DOLL'S HOUSE, PART 2 is suffused with a contagious bemusement.” —Deadline.com. “[A DOLL'S HOUSE, PART 2] delivers explosive laughs while also posing thoughtful questions about marriage, gender inequality and human rights…as much an ingenious elaboration and deconstruction of A Doll’s House as a sequel, and it stands perfectly well on its own…With unfussy eloquence, [the play] asks how much, in a century-plus, life has changed for Nora and women like her in a world that often still has firm ideas about where they belong.” —Hollywood Reporter.
- *   {awards text would go here}
+ *   7 men, 3 women (3 of the 7 men are nonspeaking roles)
+ *   Total Cast: 10, Flexible Set
+ *   $80 per performance.
+ *   Bored with his routine posting in Beijing, and awkward with women, Rene Gallimard, a French diplomat, is easy prey for the subtle, delicate charms of Song Liling, a Chinese opera star who personifies Gallimard's fantasy vision of submissive, exotic oriental sexuality. He begins an affair with "her" that lasts for twenty years, during which time he passes along diplomatic secrets, an act that, eventually, brings on his downfall and imprisonment. Interspersed with scenes between the two lovers are others with Gallimard's wife and colleagues that underscore the irony of Gallimard's delusion and its curious parallel to the events of Puccini's famous opera Madame Butterfly. Combining realism and ritual with vivid theatricality, the play reaches its astonishing climax when Song Liling, before our very eyes, strips off his female attire and assumes his true masculinity—a revelation that the deluded Gallimard can neither credit nor accept and which drives him finally—and fatally—deep within the fantasy with which, over the years, he has held the truth at bay.
+ *   "With M. BUTTERFLY David Henry Hwang joins the first string of American playwrights. This is an audaciously imaginative play, big in conception and theme, and a satisfying instance of a talented writer hitting full stride." —Variety. "Of all the young dramatists at work in America today, none is more audacious, imaginative, or gifted than David Henry Hwang…" —The New Yorker. "It will move you, it will thrill you, it may even surprise you. It is a play not to be missed, and it is a play once caught that will never be forgotten." —NY Post.
+ *   Winner of the Tony Award, the Drama Desk Award and the Outer Critics Circle Award as Best Broadway Play.
  */
 export function entryFromDPSDetail(raw: string): Script|null {
   if (!raw.trim()) return null

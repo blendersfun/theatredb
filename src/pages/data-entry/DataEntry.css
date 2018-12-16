@@ -1,6 +1,11 @@
 .data-entry textarea {
   width: 400px;
-  height: 250px;
+}
+.data-entry textarea.list {
+  height: 200px;
+}
+.data-entry textarea.detail {
+  height: 350px;
 }
 .data-entry .container.horizontal {
   display: flex;
