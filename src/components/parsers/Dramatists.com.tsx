@@ -2,12 +2,13 @@ import React, {
   Component, RefObject, createRef
 } from 'react'
 import { parseDate } from './utils'
+import { Document } from '../../logic/model/Document'
 import { Production, Script } from '../../logic/model'
 import { PersonInRole } from '../../logic/model/Summaries'
 import { ScriptDetail } from '../../logic/model/Script'
 
 type DramatistsComProps = {
-  onParse: (production: Production|null, script: Script|null) => void
+  onParse: (parsed: { [label: string]: Document<any, any> }) => void
 }
 
 export class DramatistsCom extends Component<DramatistsComProps, {}> {
@@ -56,11 +57,14 @@ Winner of the Tony Award, the Drama Desk Award and the Outer Critics Circle Awar
     const textareaDPSList = this.textareaDPSList.current
     const textareaDPSDetail = this.textareaDPSDetail.current
     if (!textareaDPSList || !textareaDPSDetail) return
+    const parsed: { [label: string]: Document<any, any> } = {}
     const production = entryFromDPSList(textareaDPSList.value)
     const script = entryFromDPSDetail(textareaDPSDetail.value)
+    if (production) parsed.Production = production
+    if (script) parsed.Script = script
     window.sessionStorage.DPSList = textareaDPSList.value
     window.sessionStorage.DPSDetail = textareaDPSDetail.value
-    this.props.onParse(production, script)
+    this.props.onParse(parsed)
   }
   clear() {
     const textareaDPSList = this.textareaDPSList.current

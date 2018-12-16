@@ -39,7 +39,7 @@ export class Home extends Component {
   }
   async fetchProductions(): Promise<void> {
     const productions = await db.collection<ProductionDetail>('productions')
-      .find({}, { limit: 1000 })
+      .find({ 'schedule.closingDate': { $gte: new Date() } }, { limit: 1000 })
       .asArray()
     this.setState({
       productions,
@@ -149,8 +149,8 @@ export class HomeUI extends Component<HomeProps> {
     // details at this point:
     // onClick={this.selectProduction.bind(this, productionId)}
     return (
-      <>
-        <tr key={productionId} className="production">
+      <React.Fragment key={productionId}>
+        <tr className="production">
           <td>{p.name}</td>
           <td>{this.renderAuthors(p.script && p.script.authors)}</td>
           <td>{p.organization.name}</td>
@@ -165,12 +165,12 @@ export class HomeUI extends Component<HomeProps> {
           }</td>
         </tr>
         {this.renderProductionDetail(p)}
-      </>
+      </React.Fragment>
     )
   }
-  renderProductionDetail(p: ProductionDetail): ReactElement<HTMLTableRowElement>|string {
+  renderProductionDetail(p: ProductionDetail): ReactElement<HTMLTableRowElement>|null {
     const productionId = p._id && p._id.toString()
-    if (!productionId || productionId !== this.props.selected) return ''
+    if (!productionId || productionId !== this.props.selected) return null
     return (
       <tr key={productionId + '_detail'}>
         <td colSpan={6}>

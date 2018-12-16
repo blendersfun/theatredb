@@ -7,12 +7,11 @@ import React, {
 import { DramatistsCom } from '../../components/parsers/Dramatists.com'
 
 import {
-  Production, Script
-} from '../../logic/model'
+  Document
+} from '../../logic/model/Document'
 
 type DataEntryState = {
-  production: Production|null,
-  script: Script|null
+  parsed: { [label: string]: Document<any, any> }
 }
 
 export class DataEntry extends Component<{}, DataEntryState> {
@@ -20,21 +19,18 @@ export class DataEntry extends Component<{}, DataEntryState> {
   constructor(props: {}) {
     super(props)
     this.parserComponent = createRef()
+    this.state = {
+      parsed: {}
+    }
   }
   async saveToDatabase() {
-    if (this.state.production) {
-      await this.state.production.upsert()
-    }
-    if (this.state.script) {
-      await this.state.script.upsert()
+    for (const parsedItem of Object.values(this.state.parsed)) {
+      await parsedItem.upsert()
     }
   }
   async find() {
-    if (this.state.production) {
-      await this.state.production.find()
-    }
-    if (this.state.script) {
-      await this.state.script.find()
+    for (const parsedItem of Object.values(this.state.parsed)) {
+      await parsedItem.find()
     }
     this.forceUpdate()
   }
@@ -43,10 +39,11 @@ export class DataEntry extends Component<{}, DataEntryState> {
     if (parserComponent) {
       parserComponent.clear()
     }
-    this.setState({ production: null, script: null })
+    this.setState({ parsed: {} })
   }
-  onParse(production: Production|null, script: Script|null) {
-    this.setState({ production, script })
+  onParse(parsed: { [label: string]: Document<any, any> }) {
+    if (!Object.keys(parsed).length) return
+    this.setState({ parsed })
   }
   render() {
     return (
@@ -72,10 +69,6 @@ type DataEntryProps = DataEntryState & {
 export class DataEntryUI extends Component<DataEntryProps> {
   constructor(props: DataEntryProps) {
     super(props)
-    this.state = {
-      production: null,
-      script: null
-    }
   }
   render() {
     return (
@@ -88,24 +81,26 @@ export class DataEntryUI extends Component<DataEntryProps> {
             <button onClick={this.saveToDatabase.bind(this)}>Save</button>
             <button onClick={this.clear.bind(this)}>Clear</button>
           </div>
-          <div className="preview">
-          Data Preview:{'\n'}
-          ---{'\n'}
-          {JSON.stringify(
-            this.props.production && this.props.production.document,
-            null,
-            2
-          )}{'\n'}
-          ---{'\n'}
-          {JSON.stringify(
-            this.props.script && this.props.script.document,
-            null,
-            2
-          )}
+          <div className="previews">
+          Data Preview:<br/>
+          {Object.keys(this.props.parsed).map(label => {
+            return this.renderParsedItemPreview(label, this.props.parsed[label])
+          })}
           </div>
         </div>
       </div>
     )
+  }
+  renderParsedItemPreview(label: string, parsedItem: Document<any, any>) {
+    return (<div key={label} className="preview">
+      ---{'\n'}
+      {label}:{'\n'}
+      {JSON.stringify(
+        parsedItem.document,
+        null,
+        2
+      )}{'\n'}
+    </div>)
   }
   find() {
     this.props.find()
