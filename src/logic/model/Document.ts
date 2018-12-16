@@ -51,6 +51,29 @@ export class Document<S extends DocumentType, D extends DocumentType> {
     Object.assign(this.document, serverMatches[0])
     // console.log('Upsert Successful', this.constructor.name, this.document)
   }
+  async find(): Promise<void> {
+    const query = this.identity()
+    const SpecificDocument = this.constructor as typeof Document
+    const collection = SpecificDocument.collection
+    let serverMatches: any[]|null = null
+    try {
+      serverMatches = await db.collection(collection).find(query).asArray()
+    } catch (err) {
+      console.error(
+        `Encountered error during find of ${JSON.stringify(collection)}, ` +
+        `with query ${JSON.stringify(query)}:`, err
+      )
+      throw err
+    }
+    if (serverMatches.length === 0) return
+    if (serverMatches.length > 1) {
+      throw new Error(
+        `More than one server match for ${JSON.stringify(query)}. ` +
+        `We need some way to disambiguate. Or is it duplicates?!`
+      )
+    }
+    Object.assign(this.document, serverMatches[0])
+  }
   async preSave(): Promise<void> {}
   identity(): any {
     throw new Error(
