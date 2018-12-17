@@ -1,26 +1,37 @@
 import './DataEntry.css'
 
 import React, {
-  Component, RefObject, createRef
+  Component,
+  RefObject,
+  createRef,
+  ChangeEvent
 } from 'react'
 
-import { DramatistsCom } from '../../components/parsers/Dramatists.com'
+import { DramatistsParser } from '../../components/parsers/Dramatists'
+import { SamFrenchParser } from '../../components/parsers/SamFrench'
 
 import {
   Document
 } from '../../logic/model/Document'
 
 type DataEntryState = {
-  parsed: { [label: string]: Document<any, any> }
+  parsed: { [label: string]: Document<any, any> },
+  parserName: string|null
 }
 
+const parsers = [
+  DramatistsParser,
+  SamFrenchParser
+]
+
 export class DataEntry extends Component<{}, DataEntryState> {
-  parserComponent: RefObject<DramatistsCom>
+  parserComponent: RefObject<any>
   constructor(props: {}) {
     super(props)
     this.parserComponent = createRef()
     this.state = {
-      parsed: {}
+      parsed: {},
+      parserName: window.sessionStorage.selectedParser || null
     }
   }
   async saveToDatabase() {
@@ -45,13 +56,21 @@ export class DataEntry extends Component<{}, DataEntryState> {
     if (!Object.keys(parsed).length) return
     this.setState({ parsed })
   }
+  selectParser(parserName: string) {
+    window.sessionStorage.selectedParser = parserName
+    const parser = parsers.find(p => p.parserName === parserName)
+    if (!parser) return
+    this.setState({ parserName: parserName })
+  }
   render() {
+    const Parser = parsers.find(p => p.parserName === this.state.parserName) || parsers[0]
     return (
       <DataEntryUI {...this.state}
         saveToDatabase={this.saveToDatabase.bind(this)}
         clear={this.clear.bind(this)}
-        find={this.find.bind(this)}>
-        <DramatistsCom 
+        find={this.find.bind(this)}
+        selectParser={this.selectParser.bind(this)}>
+        <Parser
           ref={this.parserComponent}
           onParse={this.onParse.bind(this)}
           />
@@ -63,7 +82,8 @@ export class DataEntry extends Component<{}, DataEntryState> {
 type DataEntryProps = DataEntryState & {
   saveToDatabase: () => void,
   clear: () => void,
-  find: () => void
+  find: () => void,
+  selectParser: (parserName: string) => void
 }
 
 export class DataEntryUI extends Component<DataEntryProps> {
@@ -74,6 +94,13 @@ export class DataEntryUI extends Component<DataEntryProps> {
     return (
       <div className="page data-entry">
         <h1>Data Entry</h1>
+        <select
+          onChange={this.selectParser.bind(this)}
+          defaultValue={this.props.parserName || parsers[0].parserName}>
+          {parsers.map(p => (
+            <option key={p.parserName}>{p.parserName}</option>
+          ))}
+        </select>
         <div className="container horizontal">
           <div>
             {this.props.children}
@@ -111,5 +138,10 @@ export class DataEntryUI extends Component<DataEntryProps> {
   }
   clear() {
     this.props.clear()
+  }
+  selectParser(event: ChangeEvent<HTMLSelectElement>) {
+    const selected = event.target.selectedOptions[0]
+    if (!selected) return
+    this.props.selectParser(selected.value)
   }
 }

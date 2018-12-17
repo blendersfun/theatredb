@@ -8,7 +8,7 @@ import React, {
 import _ from 'lodash'
 
 import { db } from '../../logic/stitch'
-import { ProductionDetail, Production } from '../../logic/model/Production'
+import { ProductionDetail } from '../../logic/model/Production'
 import { PersonInRole } from '../../logic/model/Summaries'
 
 interface HomeState {

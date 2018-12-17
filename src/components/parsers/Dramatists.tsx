@@ -1,23 +1,21 @@
 import React, {
   Component, RefObject, createRef
 } from 'react'
+import { ParserProps } from './Parser'
 import { parseDate } from './utils'
 import { Document } from '../../logic/model/Document'
 import { Production, Script } from '../../logic/model'
 import { PersonInRole } from '../../logic/model/Summaries'
 import { ScriptDetail } from '../../logic/model/Script'
 
-type DramatistsComProps = {
-  onParse: (parsed: { [label: string]: Document<any, any> }) => void
-}
-
-export class DramatistsCom extends Component<DramatistsComProps, {}> {
-  textareaDPSList: RefObject<HTMLTextAreaElement>
-  textareaDPSDetail: RefObject<HTMLTextAreaElement>
-  constructor(props: DramatistsComProps) {
+export class DramatistsParser extends Component<ParserProps, {}> {
+  static parserName = 'dramatists.com'
+  textareaList: RefObject<HTMLTextAreaElement>
+  textareaDetail: RefObject<HTMLTextAreaElement>
+  constructor(props: ParserProps) {
     super(props)
-    this.textareaDPSList = createRef()
-    this.textareaDPSDetail = createRef()
+    this.textareaList = createRef()
+    this.textareaDetail = createRef()
   }
   componentDidMount() {
     this.parse()
@@ -27,7 +25,7 @@ export class DramatistsCom extends Component<DramatistsComProps, {}> {
       <label>DPS List Entry:</label><br/>
       <textarea
         className="list"
-        ref={this.textareaDPSList}
+        ref={this.textareaList}
         onChange={this.parse.bind(this)}
         defaultValue={window.sessionStorage.DPSList}
         placeholder="M. Butterfly
@@ -37,7 +35,7 @@ Artswest Playhouse and Gallery  | Seattle,  WA  Professional production,  Openin
       <label>DPS Detail Entry:</label><br/>
       <textarea
         className="detail"
-        ref={this.textareaDPSDetail}
+        ref={this.textareaDetail}
         onChange={this.parse.bind(this)}
         defaultValue={window.sessionStorage.DPSDetail}
         placeholder="M. Butterfly
@@ -54,24 +52,24 @@ Winner of the Tony Award, the Drama Desk Award and the Outer Critics Circle Awar
     </>)
   }
   parse() {
-    const textareaDPSList = this.textareaDPSList.current
-    const textareaDPSDetail = this.textareaDPSDetail.current
-    if (!textareaDPSList || !textareaDPSDetail) return
+    const textareaList = this.textareaList.current
+    const textareaDetail = this.textareaDetail.current
+    if (!textareaList || !textareaDetail) return
+    window.sessionStorage.DPSList = textareaList.value
+    window.sessionStorage.DPSDetail = textareaDetail.value
     const parsed: { [label: string]: Document<any, any> } = {}
-    const production = entryFromDPSList(textareaDPSList.value)
-    const script = entryFromDPSDetail(textareaDPSDetail.value)
+    const production = entryFromDPSList(textareaList.value)
+    const script = entryFromDPSDetail(textareaDetail.value)
     if (production) parsed.Production = production
     if (script) parsed.Script = script
-    window.sessionStorage.DPSList = textareaDPSList.value
-    window.sessionStorage.DPSDetail = textareaDPSDetail.value
     this.props.onParse(parsed)
   }
   clear() {
-    const textareaDPSList = this.textareaDPSList.current
-    const textareaDPSDetail = this.textareaDPSDetail.current
-    if (!textareaDPSList || !textareaDPSDetail) return
-    window.sessionStorage.DPSList = textareaDPSList.value = ''
-    window.sessionStorage.DPSDetail = textareaDPSDetail.value = ''
+    const textareaList = this.textareaList.current
+    const textareaDetail = this.textareaDetail.current
+    if (!textareaList || !textareaDetail) return
+    window.sessionStorage.DPSList = textareaList.value = ''
+    window.sessionStorage.DPSDetail = textareaDetail.value = ''
   }
 }
 
