@@ -30,7 +30,7 @@ export class SamFrenchParser extends Component<ParserProps, {}> {
         ref={this.textareaList}
         onChange={this.parse.bind(this)}
         defaultValue={window.sessionStorage.SamFrenchList}
-        placeholder=""
+        placeholder="The Wolves 	Roosevelt High School Theatre 	Sarah DeLappe 	Seattle 	Washington 	3/6/2019 	3/9/2019"
         ></textarea><br/>
       <label>Samuel French Detail Page:</label><br/>
       <textarea
@@ -38,7 +38,11 @@ export class SamFrenchParser extends Component<ParserProps, {}> {
         ref={this.textareaDetail}
         onChange={this.parse.bind(this)}
         defaultValue={window.sessionStorage.SamFrenchDetail}
-        placeholder=""
+        placeholder="The Wolves
+by: Sarah DeLappe
+ISBN: 9780573705977
+Left quad. Right quad. Lunge. A girls indoor soccer team warms up. From the safety of their suburban stretch circle, the team navigates big questions and wages tiny battles with all the vim and vigor of a pack of adolescent warriors. A portrait of life, liberty, and the pursuit of happiness for nine American girls who just want to score some goals. 
+&quo;scary, exhilarating brightness of raw adolescence emanates from every scene of this uncannily assured first play by Sarah DeLappe.&quo; - The New York Times"
         ></textarea><br/>
     </>)
   }
