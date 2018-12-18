@@ -16,6 +16,7 @@ export type DocumentType = {
 
 export class Document<S extends DocumentType, D extends DocumentType> {
   static collection = '' // To be filled in by sub-class.
+  static subDocuments: { [schemaPath: string]: any }
   document: D
   constructor(document: D) {
     this.document = document
@@ -52,6 +53,7 @@ export class Document<S extends DocumentType, D extends DocumentType> {
     // console.log('Upsert Successful', this.constructor.name, this.document)
   }
   async find(): Promise<void> {
+    // Find this whole document:
     const query = this.identity()
     const SpecificDocument = this.constructor as typeof Document
     const collection = SpecificDocument.collection
@@ -65,16 +67,52 @@ export class Document<S extends DocumentType, D extends DocumentType> {
       )
       throw err
     }
-    if (serverMatches.length === 0) return
     if (serverMatches.length > 1) {
       throw new Error(
         `More than one server match for ${JSON.stringify(query)}. ` +
         `We need some way to disambiguate. Or is it duplicates?!`
       )
     }
-    Object.assign(this.document, serverMatches[0])
+    if (serverMatches.length === 1) {
+      Object.assign(this.document, serverMatches[0])
+    }
+
+    // Find any sub-ducuments, if they are not already _id-ed:
+    await Promise.all(this.collectSubDocuments().map(sub => sub.find()))
   }
-  async preSave(): Promise<void> {}
+  collectSubDocuments(): Document<any, any>[] {
+    const SpecificDocument = this.constructor as typeof Document
+    if (!SpecificDocument.subDocuments) return []
+    let allSubDocuments: Document<any, any>[] = []
+    for (const schemaPath of Object.keys(SpecificDocument.subDocuments)) {
+      const segments = schemaPath.split('.')
+      const SubDocument = SpecificDocument.subDocuments[schemaPath]
+      allSubDocuments = allSubDocuments.concat(
+        this._collectSubDocuments(this.document, segments, SubDocument)
+      )
+    }
+    return allSubDocuments
+  }
+  _collectSubDocuments(current: any, segments: string[], SubDocument: any): Document<any, any>[] {
+    if (!segments.length) {
+      return [new SubDocument(current)]
+    }
+    const segment = segments[0]
+    if (current[segment] === undefined) return []
+    if (current[segment] instanceof Array) {
+      let results: Document<any, any>[] = []
+      for (const item of current[segment]) {
+        results = results.concat(
+          this._collectSubDocuments(item, segments.slice(1), SubDocument)
+        )
+      }
+      return results
+    }
+    return this._collectSubDocuments(current[segment], segments.slice(1), SubDocument)
+  }
+  async preSave(): Promise<void> {
+    await Promise.all(this.collectSubDocuments().map(sub => sub.upsert()))
+  }
   identity(): any {
     throw new Error(
       'Default impl of identity() is a stub. ' +

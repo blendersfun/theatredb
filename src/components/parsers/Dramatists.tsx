@@ -2,7 +2,7 @@ import React, {
   Component, RefObject, createRef
 } from 'react'
 import { ParserProps } from './Parser'
-import { parseDate } from './utils'
+import { parseDate, parseReviews } from './utils'
 import { Document } from '../../logic/model/Document'
 import { Production, Script } from '../../logic/model'
 import { PersonInRole } from '../../logic/model/Summaries'
@@ -73,7 +73,6 @@ Winner of the Tony Award, the Drama Desk Award and the Outer Critics Circle Awar
   }
 }
 
-
 /**
  * Parses a list of authors into an array of Person objects.
  * 
@@ -112,9 +111,9 @@ function parseAuthors(raw: string): PersonInRole[] {
  * - Example URL: https://www.dramatists.com/dps/productions.aspx
  * - Example Raw Record:
  * 
- *   The Call
- *   Tanya Barfield
- *   Seattle Public Theatre  | Seattle,  WA  Professional production,  Opening: 5/10/2019 thru  6/9/2019)
+ *  1|The Call
+ *   |Tanya Barfield
+ *   |Seattle Public Theatre  | Seattle,  WA  Professional production,  Opening: 5/10/2019 thru  6/9/2019)
  * 
  * - Notes:
  *    - This can be copied and pasted in one go.
@@ -195,24 +194,7 @@ export function entryFromDPSDetail(raw: string): Script|null {
   const [, womenCount] = (lines[4] || '').match(/(\d+) wom[ae]n/) || [,,]
   const [, totalCastCount] = (lines[5] || '').match(/^Total Cast: (\d+)/) || [,,]
 
-  let reviewsRaw = lines[8] ? lines[8].trim() : ''
-  const reviews = []
-  let safety = 0
-  while(reviewsRaw.length) {
-    safety += 1
-    if (safety > 100) throw new Error('too much')
-    const reviewStart = reviewsRaw.search(/[“"]/)
-    if (reviewStart === -1) break
-    reviewsRaw = reviewsRaw.slice(reviewStart + 1)
-    const reviewEnd = reviewsRaw.search(/[”"]/)
-    if (reviewEnd === -1) break
-    const review = reviewsRaw.slice(0, reviewEnd)
-    const [, source] = reviewsRaw.match(/\s+—([^\.“"]+)/) || [,,]
-    if (review && source) {
-      reviews.push({ review, source })
-    }
-    reviewsRaw = reviewsRaw.slice(reviewEnd + 1)
-  }
+  const reviews = parseReviews(lines[8] ? lines[8].trim() : '')
 
   const roles: ScriptDetail["roles"] = {
     total: parseInt(totalCastCount || '-1')

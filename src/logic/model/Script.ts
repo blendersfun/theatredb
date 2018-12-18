@@ -23,12 +23,10 @@ export type ScriptDetail = ScriptSummary & {
 
 export class Script extends Document<ScriptSummary, ScriptDetail> {
   static collection = 'scripts'
+  static subDocuments = {
+    'authors.person': Person
+  }
   identity(): any {
     return { name: this.document.name }
-  }
-  async preSave(): Promise<void> {
-    const upsertAuthors = this.document.authors
-      .map(author => new Person(author.person).upsert())
-    await Promise.all(upsertAuthors)
   }
 }
